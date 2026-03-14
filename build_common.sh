@@ -55,7 +55,9 @@ do_build() {
     if [[ ${#MISSING[@]} -gt 0 ]]; then
         log "Installing: ${MISSING[*]}"
         if command -v apt-get &>/dev/null; then
-            apt-get update -qq && apt-get install -y -qq \
+            local SUDO=""
+            [[ $(id -u) -ne 0 ]] && SUDO="sudo"
+            $SUDO apt-get update -qq && $SUDO apt-get install -y -qq \
                 build-essential bc flex bison cpio dwarves libssl-dev python3 curl git 2>&1 | tail -1
         else
             die "Missing: ${MISSING[*]}. Install manually."
