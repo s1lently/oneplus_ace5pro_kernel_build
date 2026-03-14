@@ -26,6 +26,13 @@ bash build_android15.sh
 
 Three commands: clone, cd, bash. Everything else is automatic.
 
+### Alternative: repo sync (x86_64, full workspace with AOSP prebuilts)
+
+```bash
+repo init -u https://github.com/s1lently/oneplus_ace5pro_kernel_build -b main -m manifests/android16.xml
+repo sync -c --no-tags -j8
+```
+
 ## Supported platforms
 
 - **arm64 Linux** (OrbStack, native ARM server) — auto-downloads ARM64 Clang from release
