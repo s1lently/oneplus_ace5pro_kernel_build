@@ -1,5 +1,9 @@
 # OnePlus Ace 5 Pro Kernel Build
 
+The community has long struggled with building Android kernels on Apple Silicon and other ARM64 devices. Today, s1lently hopes to change that.
+
+社区长期苦于在 Apple Silicon 等 ARM64 设备上构建安卓内核。今天，s1lently 希望解决这一切。
+
 Build scripts for OnePlus Ace 5 Pro (SM8750) kernel compilation.
 
 ## Repositories
