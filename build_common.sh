@@ -12,6 +12,7 @@ COMMON_REPO="https://github.com/s1lently/android_kernel_common_oneplus_sm8750"
 MSM_REPO="https://github.com/s1lently/android_kernel_oneplus_sm8750"
 MODULES_REPO="https://github.com/s1lently/android_kernel_modules_and_devicetree_oneplus_sm8750"
 CLANG_ARM64_URL="https://github.com/s1lently/llvm-project/releases/download/r510928-arm64/aosp-clang-r510928-arm64-kernel.tar.gz"
+CLANG_X86_64_URL="https://github.com/s1lently/llvm-project/releases/download/r510928-arm64/aosp-clang-r510928-x86_64-kernel.tar.gz"
 
 # ── Colors ───────────────────────────────────────────────────
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; NC='\033[0m'
@@ -68,29 +69,25 @@ do_build() {
     clone_if_missing "$MODULES_REPO" "$WORKSPACE"                "$BRANCH"
 
     # ── Toolchain ─────────────────────────────────────────────
-    local CLANG_PREBUILT="$PLATFORM_DIR/prebuilts/clang/host/linux-x86/clang-r510928/bin"
-    local AOSP_CLANG_ARM64="$HOME/aosp-clang-r510928/bin"
+    local AOSP_CLANG="$HOME/aosp-clang-r510928/bin"
     local PAHOLE_CMD="pahole"
 
-    if [[ "$PLATFORM" == "arm64" ]]; then
-        if [[ ! -f "$AOSP_CLANG_ARM64/clang" ]]; then
-            log "Downloading arm64 Clang..."
-            curl -L "$CLANG_ARM64_URL" -o /tmp/aosp-clang.tar.gz
-            rm -rf "$HOME/aosp-clang-r510928" "$HOME/clang-kernel-only"
-            tar xzf /tmp/aosp-clang.tar.gz -C "$HOME"
-            mv "$HOME/clang-kernel-only" "$HOME/aosp-clang-r510928"
-            rm -f /tmp/aosp-clang.tar.gz
-            log "✓ Clang installed"
+    if [[ ! -f "$AOSP_CLANG/clang" ]]; then
+        local CLANG_URL
+        if [[ "$PLATFORM" == "arm64" ]]; then
+            CLANG_URL="$CLANG_ARM64_URL"
+        else
+            CLANG_URL="$CLANG_X86_64_URL"
         fi
-        export PATH="$AOSP_CLANG_ARM64:$PATH"
-    else
-        if [[ ! -f "$CLANG_PREBUILT/clang" ]]; then
-            die "x86_64 Clang not found at $CLANG_PREBUILT\nNeed AOSP prebuilts via repo sync."
-        fi
-        export PATH="$CLANG_PREBUILT:$PATH"
-        local PAHOLE_BIN="$PLATFORM_DIR/prebuilts/kernel-build-tools/linux-x86/bin/pahole"
-        [[ -f "$PAHOLE_BIN" ]] && PAHOLE_CMD="$PAHOLE_BIN"
+        log "Downloading $PLATFORM Clang..."
+        curl -L "$CLANG_URL" -o /tmp/aosp-clang.tar.gz
+        rm -rf "$HOME/aosp-clang-r510928" "$HOME/clang-kernel-only"
+        tar xzf /tmp/aosp-clang.tar.gz -C "$HOME"
+        mv "$HOME/clang-kernel-only" "$HOME/aosp-clang-r510928"
+        rm -f /tmp/aosp-clang.tar.gz
+        log "✓ Clang installed"
     fi
+    export PATH="$AOSP_CLANG:$PATH"
 
     log "Clang: $(clang --version | head -1)"
 
