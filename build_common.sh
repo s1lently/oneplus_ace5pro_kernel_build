@@ -58,7 +58,7 @@ do_build() {
             local SUDO=""
             [[ $(id -u) -ne 0 ]] && SUDO="sudo"
             $SUDO apt-get update -qq && $SUDO apt-get install -y -qq \
-                build-essential bc flex bison cpio dwarves libssl-dev python3 curl git 2>&1 | tail -1
+                build-essential bc flex bison cpio dwarves libssl-dev libelf-dev python3 curl git 2>&1 | tail -1
         else
             die "Missing: ${MISSING[*]}. Install manually."
         fi
