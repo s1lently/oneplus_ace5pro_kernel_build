@@ -6,6 +6,7 @@ WORKSPACE="$SCRIPT_DIR/kernel_workspace"
 PLATFORM_DIR="$WORKSPACE/kernel_platform"
 KERNEL_DIR="$PLATFORM_DIR/common"
 OUT_DIR="$KERNEL_DIR/out"
+MODULES_DIR="$WORKSPACE/modules_and_devicetree"
 
 # ── Source repos (forks from OnePlusOSS) ─────────────────────
 COMMON_REPO="https://github.com/s1lently/android_kernel_common_oneplus_sm8750"
@@ -68,7 +69,7 @@ do_build() {
     mkdir -p "$PLATFORM_DIR"
     clone_if_missing "$COMMON_REPO"  "$KERNEL_DIR"               "$BRANCH"
     clone_if_missing "$MSM_REPO"     "$PLATFORM_DIR/msm-kernel"  "$BRANCH"
-    clone_if_missing "$MODULES_REPO" "$WORKSPACE"                "$BRANCH"
+    clone_if_missing "$MODULES_REPO" "$MODULES_DIR"              "$BRANCH"
 
     # ── Toolchain ─────────────────────────────────────────────
     local AOSP_CLANG="$HOME/aosp-clang-r510928/bin"
@@ -119,7 +120,8 @@ do_build() {
     # ── Build ─────────────────────────────────────────────────
     log "Building with $JOBS threads..."
     make -j"$JOBS" LLVM=1 ARCH=arm64 CC=clang LD=ld.lld HOSTLD=ld.lld \
-        PAHOLE="$PAHOLE_CMD" O=out -C "$KERNEL_DIR" all
+        PAHOLE="$PAHOLE_CMD" O=out -C "$KERNEL_DIR" \
+        ${EXTRA_KCFLAGS:+KCFLAGS="$EXTRA_KCFLAGS"} all
 
     local IMAGE="$OUT_DIR/arch/arm64/boot/Image"
     [[ -f "$IMAGE" ]] || die "Build failed: Image not generated"
